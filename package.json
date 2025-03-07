@@ -1,6 +1,6 @@
 {
   "name": "mail-notifier-sdk",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "SDK for the Email Monitoring Service",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
