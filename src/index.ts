@@ -1,4 +1,5 @@
 // src/index.ts
+import axios from "axios";
 
 export type EventType = "error" | "success" | "warning" | "info";
 export type ImpactLevel = "critical" | "high" | "medium" | "low";
@@ -24,28 +25,6 @@ export interface EmailPayload {
   };
 }
 
-/**
- * Dynamically imports node-fetch for Node.js environments
- * without causing issues in browser or newer Node.js with native fetch
- */
-async function getFetch() {
-  // Try to use the built-in fetch first
-  if (typeof globalThis.fetch === "function") {
-    return globalThis.fetch.bind(globalThis);
-  }
-
-  // If not available, try to dynamically import node-fetch
-  try {
-    // This dynamic import works with ESM node-fetch v3
-    const { default: fetch } = await import("node-fetch");
-    return fetch;
-  } catch (error) {
-    throw new Error(
-      "Fetch API is not available. Please ensure you have node-fetch installed or are using Node.js 18+."
-    );
-  }
-}
-
 export class MailNotifierSDK {
   private baseUrl: string;
   private token: string;
@@ -61,34 +40,39 @@ export class MailNotifierSDK {
   async sendEmail(
     payload: EmailPayload
   ): Promise<{ message: string; eventType: string }> {
-    const fetch = await getFetch();
+    try {
+      const response = await axios.post(
+        `${this.baseUrl}/api/webhook/email`,
+        payload,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-api-key": `${this.token}`,
+          },
+        }
+      );
 
-    const response = await fetch(`${this.baseUrl}/api/webhook/email`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "x-api-key": `${this.token}`,
-      },
-      body: JSON.stringify(payload),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(`HTTP error! status: ${error.response.status}`);
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   async getStatus(): Promise<{ status: string; message: string }> {
-    const fetch = await getFetch();
-
-    const response = await fetch(`${this.baseUrl}/api/webhook/email/status`);
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+      const response = await axios.get(
+        `${this.baseUrl}/api/webhook/email/status`
+      );
+      return response.data;
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response) {
+        throw new Error(`HTTP error! status: ${error.response.status}`);
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   // Convenience methods

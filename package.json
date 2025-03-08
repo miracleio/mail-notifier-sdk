@@ -24,8 +24,8 @@
     "ts-jest": "^29.1.1",
     "typescript": "^5.2.2"
   },
+  "type": "commonjs",
   "dependencies": {
-    "node-fetch": "^3.3.2"
-  },
-  "type": "commonjs"
+    "axios": "^1.8.2"
+  }
 }
