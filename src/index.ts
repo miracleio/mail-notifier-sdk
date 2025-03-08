@@ -1,3 +1,5 @@
+// src/index.ts
+
 export type EventType = "error" | "success" | "warning" | "info";
 export type ImpactLevel = "critical" | "high" | "medium" | "low";
 
@@ -22,22 +24,24 @@ export interface EmailPayload {
   };
 }
 
-// Import node-fetch for Node.js environments
-let fetchModule: any;
-try {
-  // First try to use native fetch (for Node.js 18+)
-  fetchModule = globalThis.fetch;
-} catch (e) {
-  // If native fetch is not available, try to use node-fetch
+/**
+ * Dynamically imports node-fetch for Node.js environments
+ * without causing issues in browser or newer Node.js with native fetch
+ */
+async function getFetch() {
+  // Try to use the built-in fetch first
+  if (typeof globalThis.fetch === "function") {
+    return globalThis.fetch.bind(globalThis);
+  }
+
+  // If not available, try to dynamically import node-fetch
   try {
-    // Using dynamic import to avoid issues in browser environments
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
-    fetchModule = require("node-fetch");
-    // Handle both default and named export styles
-    if (fetchModule.default) fetchModule = fetchModule.default;
-  } catch (err) {
-    console.warn(
-      "Neither native fetch nor node-fetch is available. Please install node-fetch package for Node.js environments."
+    // This dynamic import works with ESM node-fetch v3
+    const { default: fetch } = await import("node-fetch");
+    return fetch;
+  } catch (error) {
+    throw new Error(
+      "Fetch API is not available. Please ensure you have node-fetch installed or are using Node.js 18+."
     );
   }
 }
@@ -57,13 +61,9 @@ export class MailNotifierSDK {
   async sendEmail(
     payload: EmailPayload
   ): Promise<{ message: string; eventType: string }> {
-    if (!fetchModule) {
-      throw new Error(
-        "Fetch is not available. Please install node-fetch package for Node.js environments."
-      );
-    }
+    const fetch = await getFetch();
 
-    const response = await fetchModule(`${this.baseUrl}/api/webhook/email`, {
+    const response = await fetch(`${this.baseUrl}/api/webhook/email`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -80,15 +80,9 @@ export class MailNotifierSDK {
   }
 
   async getStatus(): Promise<{ status: string; message: string }> {
-    if (!fetchModule) {
-      throw new Error(
-        "Fetch is not available. Please install node-fetch package for Node.js environments."
-      );
-    }
+    const fetch = await getFetch();
 
-    const response = await fetchModule(
-      `${this.baseUrl}/api/webhook/email/status`
-    );
+    const response = await fetch(`${this.baseUrl}/api/webhook/email/status`);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
