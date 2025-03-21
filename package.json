@@ -15,7 +15,7 @@
     "notifications",
     "alerts"
   ],
-  "author": "Your Name",
+  "author": "Miracle Onyenma",
   "license": "MIT",
   "devDependencies": {
     "@types/jest": "^29.5.5",
@@ -27,5 +27,21 @@
   "type": "commonjs",
   "dependencies": {
     "axios": "^1.8.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/miracleio/mail-notifier-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/miracleio/mail-notifier-sdk/issues"
+  },
+  "homepage": "https://github.com/miracleio/mail-notifier-sdk#readme",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md"
+  ],
+  "publishConfig": {
+    "access": "public"
   }
 }
