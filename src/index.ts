@@ -57,7 +57,7 @@ export class MailNotifierSDK {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(`HTTP error! status: ${error.response.status}`);
       }
-      throw error;
+      return { message: (error as Error).message, eventType: "error" };
     }
   }
 
@@ -71,7 +71,7 @@ export class MailNotifierSDK {
       if (axios.isAxiosError(error) && error.response) {
         throw new Error(`HTTP error! status: ${error.response.status}`);
       }
-      throw error;
+      return { status: "error", message: (error as Error).message };
     }
   }
 
