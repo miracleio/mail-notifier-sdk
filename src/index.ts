@@ -30,7 +30,7 @@ export class MailNotifierSDK {
   private token: string;
 
   constructor(
-    baseUrl: string = "https://mail-notifier-production.up.railway.app",
+    baseUrl: string = "https://mail-notifier.onrender.com",
     token: string
   ) {
     this.baseUrl = baseUrl;
