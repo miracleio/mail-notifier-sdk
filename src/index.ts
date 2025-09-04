@@ -14,7 +14,8 @@ export interface EmailPayload {
   metadata?: Record<string, any>;
   attachments?: Array<{
     filename: string;
-    content: string | Buffer;
+    content?: string | Buffer;
+    path?: string; // Add path property for URLs
   }>;
   customCredentials?: {
     host: string;
